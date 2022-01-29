@@ -1,0 +1,1 @@
+cat Data-files/movies.csv | python mapper.py -genres "Comedy|Action" -year_from 1990 -year_to 2020 -regexp Y | sort | python reduce.py -N 3

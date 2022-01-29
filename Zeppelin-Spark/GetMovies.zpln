@@ -1,0 +1,1046 @@
+﻿{
+  "paragraphs": [
+    {
+      "title": "loading raw data",
+      "text": "%sh\n\nwget -c https://files.grouplens.org/datasets/movielens/ml-latest-small.zip -o /tmp/ml-latest-small.zip \ncd /tmp/\nsudo apt install unzip\nhdfs dfs -put ml-latest-small /tmp/\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:46:58+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/sh",
+        "editorHide": false,
+        "tableHide": false,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "wget: /tmp/ml-latest-small.zip: Permission denied\nsudo: no tty present and no askpass program specified\nput: `/tmp/ml-latest-small/README.txt': File exists\nput: `/tmp/ml-latest-small/links.csv': File exists\nput: `/tmp/ml-latest-small/movies.csv': File exists\nput: `/tmp/ml-latest-small/ratings.csv': File exists\nput: `/tmp/ml-latest-small/tags.csv': File exists\n"
+          },
+          {
+            "type": "TEXT",
+            "data": "ExitValue: 1"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1638871199279_1935577176",
+      "id": "paragraph_1638871199279_1935577176",
+      "dateCreated": "2021-12-07T09:59:59+0000",
+      "dateStarted": "2021-12-13T21:46:58+0000",
+      "dateFinished": "2021-12-13T21:47:01+0000",
+      "status": "ERROR",
+      "focus": true,
+      "$$hashKey": "object:74063"
+    },
+    {
+      "title": "setting start parameters",
+      "text": "%pyspark\n\nglobal requested_year_from\nrequested_year_from = 1990 \nglobal requested_year_to\nrequested_year_to = 2020\nglobal requested_regexp\nrequested_regexp = \"Y\"\nglobal requested_genres\nrequested_genres = \"Comedy|Action\"  \nglobal requested_n\nrequested_n = 3 \n\n                          ",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:01+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "editorHide": false,
+        "tableHide": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639252755489_2128398384",
+      "id": "paragraph_1639252755489_2128398384",
+      "dateCreated": "2021-12-11T19:59:15+0000",
+      "dateStarted": "2021-12-13T21:47:01+0000",
+      "dateFinished": "2021-12-13T21:47:01+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74064"
+    },
+    {
+      "text": "%md\n# Helper puthon functions:",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:01+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h1>Helper puthon functions:</h1>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639381824172_354228500",
+      "id": "paragraph_1639381824172_354228500",
+      "dateCreated": "2021-12-13T07:50:24+0000",
+      "dateStarted": "2021-12-13T21:47:01+0000",
+      "dateFinished": "2021-12-13T21:47:01+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74065"
+    },
+    {
+      "title": "get reorganize line movies ",
+      "text": "%pyspark\nimport re\n\ndef get_reorganize_line_movies(movie_line):\n    \n    \"\"\"\n    takes: [movie_id, init_title, genres]\n    returns: [movie_id, (title, year, [genre_1, genre_2, ..., genre_n])]\n    \"\"\"\n\n    [movie_id, init_title, genres] = movie_line\n\n    title_search_results = re.sub(r'\\(\\d{4}\\)', '', init_title)\n    title = title_search_results\n\n    year_str = 0\n    year_search_results = re.findall(r'\\(\\d{4}\\)', init_title)\n    if year_search_results:\n        year_str = year_search_results[0][1:-1]\n\n    genres_arr = genres.split('|')\n\n    return [movie_id, (title, int(year_str), genres_arr)]",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:01+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639159082276_1565400061",
+      "id": "paragraph_1639159082276_1565400061",
+      "dateCreated": "2021-12-10T17:58:02+0000",
+      "dateStarted": "2021-12-13T21:47:02+0000",
+      "dateFinished": "2021-12-13T21:47:02+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74066"
+    },
+    {
+      "title": " get_reorganize_line_ratings",
+      "text": "%pyspark\n\ndef get_reorganize_line_ratings(ratings_line):\n    \n    \"\"\"\n    takes: [userId, movieId, rating, timestamp]\n    returns: [movieId, rating]\n    \"\"\"\n    \n    [userId, movieId, rating, timestamp] = ratings_line\n    \n    return [movieId, float(rating)]\n    ",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:02+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639162132824_862189586",
+      "id": "paragraph_1639162132824_862189586",
+      "dateCreated": "2021-12-10T18:48:52+0000",
+      "dateStarted": "2021-12-13T21:47:02+0000",
+      "dateFinished": "2021-12-13T21:47:02+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74067"
+    },
+    {
+      "title": "check_by_year",
+      "text": "%pyspark\r\n\r\ndef check_by_year(line):\r\n    \r\n    \"\"\"\r\n    returns “true” if the film’s publication year matches the specified parameters\r\n    \"\"\"\r\n    \r\n    _, (_, year, _) = line\r\n    \r\n    if int(requested_year_from) <= year <= int(requested_year_to):\r\n        return True\r\n    else:\r\n        return False",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:02+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639255015295_1164105249",
+      "id": "paragraph_1639255015295_1164105249",
+      "dateCreated": "2021-12-11T20:36:55+0000",
+      "dateStarted": "2021-12-13T21:47:02+0000",
+      "dateFinished": "2021-12-13T21:47:02+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74068"
+    },
+    {
+      "title": "check_by_regexp",
+      "text": "%pyspark\n\ndef check_by_regexp(line):\n    \"\"\"\n    returns “true” if the title of the movie contains an excerpt specified in the parameters\n    \"\"\"\n    \n    _, (title, _ , _) = line\n    \n    if requested_regexp is None:\n        return True\n    elif requested_regexp in title:\n        return True\n    else:\n        return False",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:02+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639255098912_429367754",
+      "id": "paragraph_1639255098912_429367754",
+      "dateCreated": "2021-12-11T20:38:18+0000",
+      "dateStarted": "2021-12-13T21:47:02+0000",
+      "dateFinished": "2021-12-13T21:47:02+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74069"
+    },
+    {
+      "title": "check_by_genre",
+      "text": "%pyspark\n\ndef check_by_genre(genre):\n    \n    \"\"\"\n    returns “true” if the genre of the movie matches the given\n    \"\"\"\n    if genre in requested_genres:\n        return True\n    else:\n        return False",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:02+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639255467654_1321367404",
+      "id": "paragraph_1639255467654_1321367404",
+      "dateCreated": "2021-12-11T20:44:27+0000",
+      "dateStarted": "2021-12-13T21:47:02+0000",
+      "dateFinished": "2021-12-13T21:47:02+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74070"
+    },
+    {
+      "title": "get_reorganize_genres",
+      "text": "%pyspark\n\ndef get_reorganize_genres(line):\n    \"\"\"\n    takes: _, ((title, year, [genre_1, genre_2, …, genre_n]), rating)\n    returns: (genre_1, (title, year, rating)), (genre_2, (title, year, rating)), …, (genre_n, (title, year, rating))\n    \"\"\"\n\n    _, ((title, year, genres), rating) = line\n    \n    for genre in genres:\n        if check_by_genre(genre):\n            yield (genre, (title, year, rating))",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:02+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639315688901_1895017659",
+      "id": "paragraph_1639315688901_1895017659",
+      "dateCreated": "2021-12-12T13:28:08+0000",
+      "dateStarted": "2021-12-13T21:47:02+0000",
+      "dateFinished": "2021-12-13T21:47:02+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74071"
+    },
+    {
+      "title": "check_by_n",
+      "text": "%pyspark\n\ndef check_by_n(collection):\n    \"\"\"\n    returns the first n movies according to the specified parameters\n    \"\"\"\n    genre, values = collection\n    \n    counter = 0\n    for title, year, rating in list(values):\n        if counter < requested_n:\n            counter += 1\n            yield '{}; {}; {}; {}'.format(genre, title, year, rating)\n        ",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:03+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639333183235_602501977",
+      "id": "paragraph_1639333183235_602501977",
+      "dateCreated": "2021-12-12T18:19:43+0000",
+      "dateStarted": "2021-12-13T21:47:03+0000",
+      "dateFinished": "2021-12-13T21:47:03+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74072"
+    },
+    {
+      "title": "reading data from movies.csv file",
+      "text": "%pyspark\nimport csv\n\nrdd_movies = sc.textFile('/tmp/ml-latest-small/movies.csv').mapPartitions (lambda x: csv.reader(x))\nheader = rdd_movies.first()\nrdd_movies = rdd_movies.filter(lambda x: x != header)\n\nrdd_movies.take(5)\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:03+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[['1', 'Toy Story (1995)', 'Adventure|Animation|Children|Comedy|Fantasy'], ['2', 'Jumanji (1995)', 'Adventure|Children|Fantasy'], ['3', 'Grumpier Old Men (1995)', 'Comedy|Romance'], ['4', 'Waiting to Exhale (1995)', 'Comedy|Drama|Romance'], ['5', 'Father of the Bride Part II (1995)', 'Comedy']]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=291",
+              "$$hashKey": "object:76521"
+            },
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=292",
+              "$$hashKey": "object:76522"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1638871133688_1552824689",
+      "id": "paragraph_1638871133688_1552824689",
+      "dateCreated": "2021-12-07T09:58:53+0000",
+      "dateStarted": "2021-12-13T21:47:03+0000",
+      "dateFinished": "2021-12-13T21:47:03+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74073"
+    },
+    {
+      "title": "converting movie data",
+      "text": "%pyspark\nimport re\n\nrdd_reorganize_movies = rdd_movies.map(lambda x: get_reorganize_line_movies(x))\nrdd_reorganize_movies.take(5)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:03+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[['1', ('Toy Story ', 1995, ['Adventure', 'Animation', 'Children', 'Comedy', 'Fantasy'])], ['2', ('Jumanji ', 1995, ['Adventure', 'Children', 'Fantasy'])], ['3', ('Grumpier Old Men ', 1995, ['Comedy', 'Romance'])], ['4', ('Waiting to Exhale ', 1995, ['Comedy', 'Drama', 'Romance'])], ['5', ('Father of the Bride Part II ', 1995, ['Comedy'])]]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=293",
+              "$$hashKey": "object:76562"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1638884242020_1714451193",
+      "id": "paragraph_1638884242020_1714451193",
+      "dateCreated": "2021-12-07T13:37:22+0000",
+      "dateStarted": "2021-12-13T21:47:03+0000",
+      "dateFinished": "2021-12-13T21:47:03+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74074"
+    },
+    {
+      "title": "Filtration of movie data by year and regexp",
+      "text": "%pyspark\n\nrdd_filtred_movies = rdd_reorganize_movies.filter(lambda x: check_by_regexp(x) and check_by_year(x))\nrdd_filtred_movies.take(5)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:03+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[['30', ('Shanghai Triad (Yao a yao yao dao waipo qiao) ', 1995, ['Crime', 'Drama'])], ['63', (\"Don't Be a Menace to South Central While Drinking Your Juice in the Hood \", 1996, ['Comedy', 'Crime'])], ['81', (\"Things to Do in Denver When You're Dead \", 1995, ['Crime', 'Drama', 'Romance'])], ['117', (\"Young Poisoner's Handbook, The \", 1995, ['Crime', 'Drama'])], ['137', ('Man of the Year ', 1995, ['Documentary'])]]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=294",
+              "$$hashKey": "object:76618"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639257874222_1774612764",
+      "id": "paragraph_1639257874222_1774612764",
+      "dateCreated": "2021-12-11T21:24:34+0000",
+      "dateStarted": "2021-12-13T21:47:04+0000",
+      "dateFinished": "2021-12-13T21:47:04+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74075"
+    },
+    {
+      "title": "reading data from ratings.csv file",
+      "text": "%pyspark\n\nrdd_ratings = sc.textFile('/tmp/ml-latest-small/ratings.csv').mapPartitions (lambda x: csv.reader(x))\nheader = rdd_ratings.first()\nrdd_ratings = rdd_ratings.filter(lambda x: x != header)\n\n\nrdd_ratings.take(5)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:04+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[['1', '1', '4.0', '964982703'], ['1', '3', '4.0', '964981247'], ['1', '6', '4.0', '964982224'], ['1', '47', '5.0', '964983815'], ['1', '50', '5.0', '964982931']]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=295",
+              "$$hashKey": "object:76883"
+            },
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=296",
+              "$$hashKey": "object:76884"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639257768373_777783346",
+      "id": "paragraph_1639257768373_777783346",
+      "dateCreated": "2021-12-11T21:22:48+0000",
+      "dateStarted": "2021-12-13T21:47:06+0000",
+      "dateFinished": "2021-12-13T21:47:06+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74076"
+    },
+    {
+      "title": "getting the average rating of a movie",
+      "text": "%pyspark\n\nrdd_reorganize_ratings = rdd_ratings.map(lambda x: get_reorganize_line_ratings(x))\nrdd_avg_ratings = rdd_reorganize_ratings.groupByKey().map(lambda x: [x[0], list(x[1])]).map(lambda x: [x[0], round(sum(x[1]) / len(x[1]), 2)])\n\nrdd_avg_ratings.take(5)\n",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:06+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[['1', 3.92], ['50', 4.24], ['70', 3.51], ['110', 4.03], ['157', 2.86]]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=297",
+              "$$hashKey": "object:76893"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639172260604_1046663849",
+      "id": "paragraph_1639172260604_1046663849",
+      "dateCreated": "2021-12-10T21:37:40+0000",
+      "dateStarted": "2021-12-13T21:47:06+0000",
+      "dateFinished": "2021-12-13T21:47:06+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74077"
+    },
+    {
+      "title": "linking movie data to ratings for those movies",
+      "text": "%pyspark\n\nrdd_joined = rdd_filtred_movies.join(rdd_avg_ratings)\n\nrdd_joined.take(5)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:06+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[('361', (('It Could Happen to You ', 1994, ['Comedy', 'Drama', 'Romance']), 3.06)), ('779', ((\"'Til There Was You \", 1997, ['Drama', 'Romance']), 4.0)), ('1057', (('Everyone Says I Love You ', 1996, ['Comedy', 'Musical', 'Romance']), 3.47)), ('1648', (('House of Yes, The ', 1997, ['Comedy', 'Drama']), 3.5)), ('1652', (('Year of the Horse ', 1997, ['Documentary']), 4.5))]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=298",
+              "$$hashKey": "object:76898"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639262827043_901769711",
+      "id": "paragraph_1639262827043_901769711",
+      "dateCreated": "2021-12-11T22:47:07+0000",
+      "dateStarted": "2021-12-13T21:47:07+0000",
+      "dateFinished": "2021-12-13T21:47:07+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74078"
+    },
+    {
+      "title": "converting data to the first correct form",
+      "text": "%pyspark\n\nrdd_normal_movies = rdd_joined.flatMap(get_reorganize_genres)\n\nrdd_normal_movies.take(5)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:07+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[('Comedy', ('It Could Happen to You ', 1994, 3.06)), ('Comedy', ('Everyone Says I Love You ', 1996, 3.47)), ('Comedy', ('House of Yes, The ', 1997, 3.5)), ('Comedy', ('Closer You Get, The ', 2000, 4.5)), ('Comedy', ('Someone Like You ', 2001, 3.5))]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=299",
+              "$$hashKey": "object:76903"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1638888287287_537891820",
+      "id": "paragraph_1638888287287_537891820",
+      "dateCreated": "2021-12-07T14:44:47+0000",
+      "dateStarted": "2021-12-13T21:47:08+0000",
+      "dateFinished": "2021-12-13T21:47:08+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74079"
+    },
+    {
+      "title": "combining films by rateng and genre",
+      "text": "%pyspark\n\nrdd_sorted_movies = rdd_normal_movies.sortBy(lambda x: (-x[1][2], -x[1][1], x[1][0]))\nrdd_sorted_movies = rdd_sorted_movies.groupByKey().sortBy(lambda x: x[0])\n\nrdd_sorted_movies = rdd_sorted_movies.map(lambda x: (x[0], list(x[1])))\nrdd_sorted_movies.take(5)",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:09+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[('Action', [('New York Cop (Nyû Yôku no koppu) ', 1993, 4.5), (\"Why Don't You Play In Hell? (Jigoku de naze warui) \", 2013, 4.25), ('3:10 to Yuma ', 2007, 4.06), ('Hero (Ying xiong) ', 2002, 3.92), ('Evangelion: 1.0 You Are (Not) Alone (Evangerion shin gekijôban: Jo) ', 2007, 3.83), ('How to Train Your Dragon 2 ', 2014, 3.77), ('Batman: Year One ', 2011, 3.67), ('Now You See Me 2 ', 2016, 3.64), ('Gintama: The Final Chapter - Be Forever Yorozuya ', 2013, 3.5), ('Evangelion: 2.0 You Can (Not) Advance (Evangerion shin gekijôban: Ha) ', 2009, 3.5), ('Futurama: Into the Wild Green Yonder ', 2009, 3.5), ('Legend, The (Legend of Fong Sai-Yuk, The) (Fong Sai Yuk) ', 1993, 3.5), ('Whole Ten Yards, The ', 2004, 3.14), (\"Jet Li's Fearless (Huo Yuan Jia) \", 2006, 3.12), ('Your Highness ', 2011, 3.11), ('Space Battleship Yamato ', 2010, 3.0), ('Princess Blade, The (Shura Yukihime) ', 2001, 3.0), ('Young Guns II ', 1990, 3.0), ('Mighty Joe Young ', 1998, 2.8), ('The Purge: Election Year ', 2016, 2.75), ('Mr. Nice Guy (Yat goh ho yan) ', 1997, 2.56), ('Evangelion: 3.0 You Can (Not) Redo ', 2012, 2.5), ('Once Upon a Time in China II (Wong Fei-hung Ji Yi: Naam yi dong ji keung) ', 1992, 2.5), ('Grandmaster, The (Yi dai zong shi) ', 2013, 2.0), (\"Dragon Ball GT: A Hero's Legacy (Doragon bôru GT: Gokû gaiden! Yûki no akashi wa sû-shin-chû) \", 1997, 2.0)]), ('Comedy', [('All Yours ', 2016, 5.0), (\"George Carlin: It's Bad for Ya! \", 2008, 5.0), ('My Sassy Girl (Yeopgijeogin geunyeo) ', 2001, 5.0), ('George Carlin: You Are All Diseased ', 1999, 5.0), ('Larry David: Curb Your Enthusiasm ', 1999, 5.0), (\"George Carlin: Jammin' in New York \", 1992, 5.0), ('All the Vermeers in New York ', 1990, 5.0), ('Sorry to Bother You ', 2018, 4.5), (\"Bill Burr: I'm Sorry You Feel That Way \", 2014, 4.5), ('Bill Burr: You People Are All the Same ', 2012, 4.5), (\"What's Your Number? \", 2011, 4.5), ('Closer You Get, The ', 2000, 4.5), ('Thank You for Smoking ', 2006, 4.03), ('Bill Burr: Walk Your Way Out ', 2017, 4.0), (\"While We're Young \", 2014, 4.0), ('You Are the Apple of My Eye ', 2011, 4.0), (\"Your Sister's Sister \", 2011, 4.0), ('Rocket Singh: Salesman of the Year ', 2009, 4.0), ('Daria: Is It Fall Yet? ', 2000, 4.0), ('Children of Heaven, The (Bacheha-Ye Aseman) ', 1997, 4.0), ('Eat Drink Man Woman (Yin shi nan nu) ', 1994, 3.89), ('Defending Your Life ', 1991, 3.85), ('While You Were Fighting: A Thor Mockumentary ', 2016, 3.83), ('Big Year, The ', 2011, 3.75), ('Me and You and Everyone We Know ', 2005, 3.75), ('Good Year, A ', 2006, 3.67), ('Now You See Me 2 ', 2016, 3.64), ('Yes Man ', 2008, 3.62), ('Only You ', 1994, 3.56), ('40-Year-Old Virgin, The ', 2005, 3.55), ('I Love You, Man ', 2009, 3.53), ('10 Things I Hate About You ', 1999, 3.53), ('Whole Nine Yards, The ', 2000, 3.52), ('The Last Five Years ', 2014, 3.5), ('Gintama: The Final Chapter - Be Forever Yorozuya ', 2013, 3.5), ('10 Years ', 2011, 3.5), (\"Love Lasts Three Years (L'amour dure trois ans) \", 2011, 3.5), ('You Again ', 2010, 3.5), ('You Will Meet a Tall Dark Stranger ', 2010, 3.5), ('Futurama: Into the Wild Green Yonder ', 2009, 3.5), ('Imagine Me & You ', 2005, 3.5), ('Someone Like You ', 2001, 3.5), ('Your Friends and Neighbors ', 1998, 3.5), ('House of Yes, The ', 1997, 3.5), ('Legend, The (Legend of Fong Sai-Yuk, The) (Fong Sai Yuk) ', 1993, 3.5), ('Everyone Says I Love You ', 1996, 3.47), ('While You Were Sleeping ', 1995, 3.47), ('I Now Pronounce You Chuck and Larry ', 2007, 3.45), ('Yours, Mine and Ours ', 2005, 3.33), ('That Thing You Do! ', 1996, 3.27), (\"How to Kill Your Neighbor's Dog \", 2000, 3.25), ('What Planet Are You From? ', 2000, 3.17), ('Whole Ten Yards, The ', 2004, 3.14), ('Synecdoche, New York ', 2008, 3.12), ('Divine Secrets of the Ya-Ya Sisterhood ', 2002, 3.12), (\"You've Got Mail \", 1998, 3.12), ('Your Highness ', 2011, 3.11), ('Longest Yard, The ', 2005, 3.11), ('P.S. I Love You ', 2007, 3.09), ('It Could Happen to You ', 1994, 3.06), (\"What to Expect When You're Expecting \", 2012, 3.0), ('Did You Hear About the Morgans? ', 2009, 3.0), ('Youth in Revolt ', 2009, 3.0), ('Lucky You ', 2007, 3.0), ('As You Like It ', 2006, 3.0), (\"You Don't Mess with the Zohan \", 2008, 2.87), (\"He's Just Not That Into You \", 2009, 2.82), ('Stuck on You ', 2003, 2.8), ('Year One ', 2009, 2.79), ('This Is Where I Leave You ', 2014, 2.75), ('Fuck You, Goethe (Fack Ju Göhte) ', 2013, 2.75), ('Great Yokai War, The (Yôkai daisensô) ', 2005, 2.75), (\"Don't Be a Menace to South Central While Drinking Your Juice in the Hood \", 1996, 2.71), ('How Do You Know ', 2010, 2.67), ('I Love You to Death ', 1990, 2.67), ('Mr. Nice Guy (Yat goh ho yan) ', 1997, 2.56), ('Home Alone 2: Lost in New York ', 1992, 2.52), ('2 Days in New York ', 2012, 2.5), ('Five-Year Engagement, The ', 2012, 2.5), ('I Love You, Beth Cooper ', 2009, 2.5), ('Man of the Year ', 2006, 2.5), ('Me Without You ', 2001, 2.5), ('Sidewalks of New York ', 2001, 2.5), ('Rookie of the Year ', 1993, 2.5), ('Leap Year ', 2010, 2.4), ('For Your Consideration ', 2006, 2.38), ('Young Adult ', 2011, 2.25), ('Young People Fucking (a.k.a. YPF) ', 2007, 2.25), ('You, Me and Dupree ', 2006, 2.17), (\"New Year's Eve \", 2011, 2.0), ('Down to You ', 2000, 2.0), ('Salmon Fishing in the Yemen ', 2011, 1.5), ('I Love You Phillip Morris ', 2009, 1.5), ('Are We Done Yet? ', 2007, 1.5), ('Yogi Bear ', 2010, 1.17), ('F*ck You, Goethe 2 ', 2015, 1.0), ('Daria: Is It College Yet? ', 2002, 1.0), ('Are We There Yet? ', 2005, 0.5)])]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=300",
+              "$$hashKey": "object:76983"
+            },
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=301",
+              "$$hashKey": "object:76984"
+            },
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=302",
+              "$$hashKey": "object:76985"
+            },
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=303",
+              "$$hashKey": "object:76986"
+            },
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=304",
+              "$$hashKey": "object:76987"
+            },
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=305",
+              "$$hashKey": "object:76988"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639322128953_1353218468",
+      "id": "paragraph_1639322128953_1353218468",
+      "dateCreated": "2021-12-12T15:15:28+0000",
+      "dateStarted": "2021-12-13T21:47:09+0000",
+      "dateFinished": "2021-12-13T21:47:09+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74080"
+    },
+    {
+      "title": "imposition of quantity limits",
+      "text": "%pyspark\n\nresult = rdd_sorted_movies.flatMap(check_by_n)\nresult.collect()",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:09+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "['Action; New York Cop (Nyû Yôku no koppu) ; 1993; 4.5', \"Action; Why Don't You Play In Hell? (Jigoku de naze warui) ; 2013; 4.25\", 'Action; 3:10 to Yuma ; 2007; 4.06', 'Comedy; All Yours ; 2016; 5.0', \"Comedy; George Carlin: It's Bad for Ya! ; 2008; 5.0\", 'Comedy; My Sassy Girl (Yeopgijeogin geunyeo) ; 2001; 5.0']\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://cluster-4128-m.us-central1-c.c.celtic-protocol-332213.internal:45483/jobs/job?id=306",
+              "$$hashKey": "object:77013"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639330521003_1851442388",
+      "id": "paragraph_1639330521003_1851442388",
+      "dateCreated": "2021-12-12T17:35:21+0000",
+      "dateStarted": "2021-12-13T21:47:10+0000",
+      "dateFinished": "2021-12-13T21:47:10+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74081"
+    },
+    {
+      "title": "saving the result",
+      "text": "%pyspark\n\nresult.saveAsTextFile('/result')",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:10+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Py4JJavaError: An error occurred while calling o8330.saveAsTextFile.\n: org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory hdfs://cluster-4128-m/result already exists\n\tat org.apache.hadoop.mapred.FileOutputFormat.checkOutputSpecs(FileOutputFormat.java:131)\n\tat org.apache.spark.internal.io.HadoopMapRedWriteConfigUtil.assertConf(SparkHadoopWriter.scala:289)\n\tat org.apache.spark.internal.io.SparkHadoopWriter$.write(SparkHadoopWriter.scala:71)\n\tat org.apache.spark.rdd.PairRDDFunctions.$anonfun$saveAsHadoopDataset$1(PairRDDFunctions.scala:1096)\n\tat scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)\n\tat org.apache.spark.rdd.RDD.withScope(RDD.scala:385)\n\tat org.apache.spark.rdd.PairRDDFunctions.saveAsHadoopDataset(PairRDDFunctions.scala:1094)\n\tat org.apache.spark.rdd.PairRDDFunctions.$anonfun$saveAsHadoopFile$4(PairRDDFunctions.scala:1067)\n\tat scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)\n\tat org.apache.spark.rdd.RDD.withScope(RDD.scala:385)\n\tat org.apache.spark.rdd.PairRDDFunctions.saveAsHadoopFile(PairRDDFunctions.scala:1032)\n\tat org.apache.spark.rdd.PairRDDFunctions.$anonfun$saveAsHadoopFile$1(PairRDDFunctions.scala:958)\n\tat scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)\n\tat org.apache.spark.rdd.RDD.withScope(RDD.scala:385)\n\tat org.apache.spark.rdd.PairRDDFunctions.saveAsHadoopFile(PairRDDFunctions.scala:958)\n\tat org.apache.spark.rdd.RDD.$anonfun$saveAsTextFile$1(RDD.scala:1544)\n\tat scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)\n\tat org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)\n\tat org.apache.spark.rdd.RDD.withScope(RDD.scala:385)\n\tat org.apache.spark.rdd.RDD.saveAsTextFile(RDD.scala:1523)\n\tat org.apache.spark.api.java.JavaRDDLike.saveAsTextFile(JavaRDDLike.scala:550)\n\tat org.apache.spark.api.java.JavaRDDLike.saveAsTextFile$(JavaRDDLike.scala:549)\n\tat org.apache.spark.api.java.AbstractJavaRDDLike.saveAsTextFile(JavaRDDLike.scala:45)\n\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\n\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\tat java.lang.reflect.Method.invoke(Method.java:498)\n\tat py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)\n\tat py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)\n\tat py4j.Gateway.invoke(Gateway.java:282)\n\tat py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)\n\tat py4j.commands.CallCommand.execute(CallCommand.java:79)\n\tat py4j.GatewayConnection.run(GatewayConnection.java:238)\n\tat java.lang.Thread.run(Thread.java:748)\n\n(<class 'py4j.protocol.Py4JJavaError'>, Py4JJavaError('An error occurred while calling o8330.saveAsTextFile.\\n', JavaObject id=o8331), <traceback object at 0x7fce873a5dc0>)"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639329769038_1150191171",
+      "id": "paragraph_1639329769038_1150191171",
+      "dateCreated": "2021-12-12T17:22:49+0000",
+      "dateStarted": "2021-12-13T21:47:10+0000",
+      "dateFinished": "2021-12-13T21:47:10+0000",
+      "status": "ERROR",
+      "$$hashKey": "object:74082"
+    },
+    {
+      "title": " result output",
+      "text": "%sh\n\nhdfs dfs -cat /result/*",
+      "user": "anonymous",
+      "dateUpdated": "2021-12-13T21:47:11+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sh",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "editorMode": "ace/mode/sh",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Action; Futurama: Into the Wild Green Yonder ; 2009; 3.5\nAction; Dragon Ball GT: A Hero's Legacy (Doragon bôru GT: Gokû gaiden! Yûki no akashi wa sû-shin-chû) ; 1997; 2.0\nAction; Why Don't You Play In Hell? (Jigoku de naze warui) ; 2013; 4.25\nComedy; It Could Happen to You ; 1994; 3.06\nComedy; Everyone Says I Love You ; 1996; 3.47\nComedy; House of Yes, The ; 1997; 3.5\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639338545374_791639835",
+      "id": "paragraph_1639338545374_791639835",
+      "dateCreated": "2021-12-12T19:49:05+0000",
+      "dateStarted": "2021-12-13T21:47:11+0000",
+      "dateFinished": "2021-12-13T21:47:14+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:74083"
+    }
+  ],
+  "name": "GetMovies",
+  "id": "2GNNMV6J6",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview2",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {
+    "isRunning": false
+  },
+  "path": "/GetMovies"
+}
